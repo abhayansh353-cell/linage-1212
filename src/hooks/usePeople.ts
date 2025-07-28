@@ -57,9 +57,21 @@ export const usePeople = () => {
     if (!user) return;
 
     try {
+      // Clean the data before inserting
+      const cleanData = {
+        ...personData,
+        user_id: user.id,
+        birth_date: personData.birth_date || null,
+        death_date: personData.death_date || null,
+        birth_place: personData.birth_place || null,
+        occupation: personData.occupation || null,
+        bio: personData.bio || null,
+        photo_url: personData.photo_url || null
+      };
+
       const { data, error } = await supabase
         .from('people')
-        .insert([{ ...personData, user_id: user.id }])
+        .insert([cleanData])
         .select()
         .single();
 
@@ -67,6 +79,7 @@ export const usePeople = () => {
       setPeople(prev => [...prev, data]);
       return data;
     } catch (err) {
+      console.error('Error adding person:', err);
       setError(err instanceof Error ? err.message : 'Failed to add person');
       throw err;
     }

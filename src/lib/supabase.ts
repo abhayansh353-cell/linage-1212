@@ -15,7 +15,7 @@ export const supabase = createClient(
 
 export const signUp = async (email: string, password: string, fullName: string) => {
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
-    throw new Error('Supabase not configured. Please set up your Supabase project and update the .env file with your project URL and anon key.');
+    throw new Error('Supabase not configured. Please set up your Supabase project first.');
   }
   
   const { data, error } = await supabase.auth.signUp({
@@ -39,7 +39,7 @@ export const signUp = async (email: string, password: string, fullName: string) 
 
 export const signIn = async (email: string, password: string) => {
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
-    throw new Error('Supabase not configured. Please set up your Supabase project and update the .env file with your project URL and anon key.');
+    throw new Error('Supabase not configured. Please set up your Supabase project first.');
   }
   
   const { data, error } = await supabase.auth.signInWithPassword({

@@ -24,7 +24,12 @@ export const Dashboard: React.FC = () => {
   );
 
   const handleAddPerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    await addPerson(personData);
+    try {
+      await addPerson(personData);
+    } catch (error) {
+      console.error('Failed to add person:', error);
+      alert('Failed to add person. Please check your Supabase configuration and try again.');
+    }
   };
 
   const handleUpdatePerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
