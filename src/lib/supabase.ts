@@ -61,3 +61,4 @@ export const signOut = async () => {
     console.error('Error signing out:', error);
     throw error;
   }
+}
