@@ -31,17 +31,23 @@ export const usePeople = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First get all relationships where either person belongs to the current user
+      const { data: relationshipData, error: relationshipError } = await supabase
         .from('relationships')
-        .select(`
-          *,
-          person1:people!relationships_person1_id_fkey(user_id),
-          person2:people!relationships_person2_id_fkey(user_id)
-        `)
-        .or(`person1.user_id.eq.${user.id},person2.user_id.eq.${user.id}`);
+        .select('*');
 
-      if (error) throw error;
-      setRelationships(data || []);
+      if (relationshipError) throw relationshipError;
+
+      // Filter relationships to only include those where both people belong to the current user
+      if (relationshipData) {
+        const userPeopleIds = people.map(p => p.id);
+        const filteredRelationships = relationshipData.filter(rel => 
+          userPeopleIds.includes(rel.person1_id) && userPeopleIds.includes(rel.person2_id)
+        );
+        setRelationships(filteredRelationships);
+      } else {
+        setRelationships([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch relationships');
     }
@@ -140,6 +146,9 @@ export const usePeople = () => {
     addRelationship,
     updatePerson,
     deletePerson,
-    refetch: () => Promise.all([fetchPeople(), fetchRelationships()])
+    refetch: async () => {
+      await fetchPeople();
+      await fetchRelationships();
+    }
   };
 };
