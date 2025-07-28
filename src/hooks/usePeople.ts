@@ -87,6 +87,26 @@ export const usePeople = () => {
 
   const addRelationship = async (person1Id: string, person2Id: string, type: Relationship['relationship_type']) => {
     try {
+      console.log('Adding relationship:', { person1Id, person2Id, type });
+      
+      // Validate that both people exist and belong to the current user
+      const person1 = people.find(p => p.id === person1Id);
+      const person2 = people.find(p => p.id === person2Id);
+      
+      if (!person1 || !person2) {
+        throw new Error('One or both people not found');
+      }
+      
+      // Check if relationship already exists
+      const existingRelationship = relationships.find(rel => 
+        (rel.person1_id === person1Id && rel.person2_id === person2Id && rel.relationship_type === type) ||
+        (rel.person1_id === person2Id && rel.person2_id === person1Id && rel.relationship_type === type)
+      );
+      
+      if (existingRelationship) {
+        throw new Error('This relationship already exists');
+      }
+      
       const { data, error } = await supabase
         .from('relationships')
         .insert([{
@@ -99,8 +119,10 @@ export const usePeople = () => {
 
       if (error) throw error;
       setRelationships(prev => [...prev, data]);
+      console.log('Relationship added successfully:', data);
       return data;
     } catch (err) {
+      console.error('Error adding relationship:', err);
       setError(err instanceof Error ? err.message : 'Failed to add relationship');
       throw err;
     }

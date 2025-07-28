@@ -32,6 +32,15 @@ export const Dashboard: React.FC = () => {
     }
   };
 
+  const handleAddRelationship = async (person1Id: string, person2Id: string, type: Relationship['relationship_type']) => {
+    try {
+      await addRelationship(person1Id, person2Id, type);
+    } catch (error) {
+      console.error('Failed to add relationship:', error);
+      // Error is already handled in the hook, just log it here
+    }
+  };
+
   const handleUpdatePerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (editingPerson) {
       await updatePerson(editingPerson.id, personData);

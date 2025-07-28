@@ -23,7 +23,10 @@ export const RelationshipModal: React.FC<RelationshipModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!person1Id || !person2Id || person1Id === person2Id) return;
+    if (!person1Id || !person2Id || person1Id === person2Id) {
+      alert('Please select two different people');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -34,6 +37,7 @@ export const RelationshipModal: React.FC<RelationshipModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Error adding relationship:', error);
+      alert(`Failed to add relationship: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }

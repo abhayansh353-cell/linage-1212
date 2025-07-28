@@ -85,7 +85,10 @@ export const BulkRelationshipModal: React.FC<BulkRelationshipModalProps> = ({
       rel.person1Id && rel.person2Id && rel.person1Id !== rel.person2Id
     );
 
-    if (validRelationships.length === 0) return;
+    if (validRelationships.length === 0) {
+      alert('Please add at least one valid relationship');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -96,6 +99,7 @@ export const BulkRelationshipModal: React.FC<BulkRelationshipModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Error adding relationships:', error);
+      alert(`Failed to add relationships: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
