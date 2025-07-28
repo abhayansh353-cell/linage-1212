@@ -147,7 +147,19 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Secure authentication powered by Supabase</p>
+          <div className="space-y-2">
+            <p>Secure authentication powered by Supabase</p>
+            {(!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-left">
+                <p className="text-amber-800 text-sm font-medium mb-2">⚠️ Supabase Setup Required</p>
+                <div className="text-amber-700 text-xs space-y-1">
+                  <p>1. Create a project at <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="underline">supabase.com</a></p>
+                  <p>2. Get your Project URL and anon key from Settings → API</p>
+                  <p>3. Update your .env file with the real values</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
