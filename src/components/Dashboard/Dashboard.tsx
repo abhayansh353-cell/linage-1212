@@ -313,7 +313,7 @@ export const Dashboard: React.FC = () => {
         isOpen={isRelationshipModalOpen}
         onClose={() => setIsRelationshipModalOpen(false)}
         people={people}
-        onAddRelationship={addRelationship}
+        onAddRelationship={handleAddRelationship}
       />
     </div>
   );
