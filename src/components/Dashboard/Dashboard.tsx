@@ -4,6 +4,7 @@ import { Plus, Users, Search, BarChart3, Link, X } from 'lucide-react';
 import { PersonCard } from '../Family/PersonCard';
 import { AddPersonModal } from '../Family/AddPersonModal';
 import { RelationshipModal } from '../Family/RelationshipModal';
+import { FamilyTreeBuilder } from '../FamilyTree/FamilyTreeBuilder';
 import { usePeople } from '../../hooks/usePeople';
 import { Person } from '../../types';
 import { RelationshipDetector } from '../../lib/relationshipDetector';
@@ -215,6 +216,15 @@ export const Dashboard: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Family Tree Builder */}
+        <div className="mt-12">
+          <FamilyTreeBuilder
+            people={people}
+            relationships={relationships}
+            onAddRelationship={addRelationship}
+          />
+        </div>
 
         {/* Selected Person Details */}
         {selectedPerson && (
