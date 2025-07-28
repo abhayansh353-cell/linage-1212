@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Users, Search, BarChart3, Link } from 'lucide-react';
+import { Plus, Users, Search, BarChart3, Link, X } from 'lucide-react';
 import { PersonCard } from '../Family/PersonCard';
 import { AddPersonModal } from '../Family/AddPersonModal';
 import { RelationshipModal } from '../Family/RelationshipModal';

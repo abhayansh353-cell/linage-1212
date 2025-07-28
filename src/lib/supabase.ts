@@ -3,18 +3,19 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Use placeholder values if environment variables are not set
-const defaultUrl = 'https://placeholder.supabase.co';
-const defaultKey = 'placeholder-anon-key';
+// Check if environment variables are properly configured
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
+  console.warn('Supabase environment variables not configured. Please set up your Supabase project.');
+}
 
 export const supabase = createClient(
-  supabaseUrl || defaultUrl, 
-  supabaseAnonKey || defaultKey
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder-anon-key'
 );
 
 export const signUp = async (email: string, password: string, fullName: string) => {
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
-    throw new Error('Please configure your Supabase environment variables first');
+    throw new Error('Please configure your Supabase environment variables first. Click "Connect to Supabase" in the top right corner.');
   }
   
   const { data, error } = await supabase.auth.signUp({
@@ -23,7 +24,8 @@ export const signUp = async (email: string, password: string, fullName: string) 
     options: {
       data: {
         full_name: fullName
-      }
+      },
+      emailRedirectTo: undefined // Disable email confirmation
     }
   });
   
@@ -37,7 +39,7 @@ export const signUp = async (email: string, password: string, fullName: string) 
 
 export const signIn = async (email: string, password: string) => {
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
-    throw new Error('Please configure your Supabase environment variables first');
+    throw new Error('Please configure your Supabase environment variables first. Click "Connect to Supabase" in the top right corner.');
   }
   
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -54,13 +56,8 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
-  if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
-    throw new Error('Please configure your Supabase environment variables first');
-  }
-  
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.error('Error signing out:', error);
     throw error;
   }
-};
