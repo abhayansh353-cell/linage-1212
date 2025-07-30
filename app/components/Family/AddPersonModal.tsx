@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Calendar, MapPin, Briefcase, FileText, Camera } from 'lucide-react';
@@ -54,24 +56,13 @@ export const AddPersonModal: React.FC<AddPersonModalProps> = ({
 
   const handleFormSubmit = async (data: PersonFormData) => {
     try {
-      // Clean empty strings to null for optional fields
-      const cleanedData = {
-        ...data,
-        birth_date: data.birth_date || undefined,
-        death_date: data.death_date || undefined,
-        birth_place: data.birth_place || undefined,
-        occupation: data.occupation || undefined,
-        bio: data.bio || undefined,
-        photo_url: data.photo_url || undefined
-      };
-      
+      console.log('Form data being submitted:', data);
       await onSubmit(data);
       reset();
       onClose();
     } catch (error) {
       console.error('Error submitting form:', error);
-      // Show error to user
-      alert('Failed to save person. Please check the console for details.');
+      alert(`Failed to save person: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

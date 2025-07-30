@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { User, Calendar, MapPin, Briefcase, Edit3, Trash2 } from 'lucide-react';

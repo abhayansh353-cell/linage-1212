@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Header } from './components/Layout/Header';
@@ -27,12 +29,10 @@ const AppContent: React.FC = () => {
   );
 };
 
-function App() {
+export default function Home() {
   return (
     <AuthProvider>
       <AppContent />
     </AuthProvider>
   );
 }
-
-export default App;

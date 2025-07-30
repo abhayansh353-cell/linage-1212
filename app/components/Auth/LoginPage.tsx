@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Eye, EyeOff, Users, Mail, Lock, User } from 'lucide-react';
 import { signIn, signUp } from '../../lib/supabase';
@@ -149,7 +151,7 @@ export const LoginPage: React.FC = () => {
         <div className="mt-8 text-center text-sm text-gray-500">
           <div className="space-y-2">
             <p>Secure authentication powered by Supabase</p>
-            {(!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) && (
+            {(!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-left">
                 <p className="text-amber-800 text-sm font-medium mb-2">⚠️ Supabase Setup Required</p>
                 <div className="text-amber-700 text-xs space-y-1">

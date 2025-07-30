@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Person, Relationship } from '../types';
@@ -14,15 +16,21 @@ export const usePeople = () => {
     if (!user) return;
 
     try {
+      console.log('Fetching people for user:', user.id);
       const { data, error } = await supabase
         .from('people')
         .select('*')
         .eq('user_id', user.id)
         .order('first_name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching people:', error);
+        throw error;
+      }
+      console.log('Fetched people:', data);
       setPeople(data || []);
     } catch (err) {
+      console.error('Error in fetchPeople:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch people');
     }
   };
@@ -31,12 +39,16 @@ export const usePeople = () => {
     if (!user) return;
 
     try {
+      console.log('Fetching relationships for user:', user.id);
       // First get all relationships where either person belongs to the current user
       const { data: relationshipData, error: relationshipError } = await supabase
         .from('relationships')
         .select('*');
 
-      if (relationshipError) throw relationshipError;
+      if (relationshipError) {
+        console.error('Error fetching relationships:', relationshipError);
+        throw relationshipError;
+      }
 
       // Filter relationships to only include those where both people belong to the current user
       if (relationshipData) {
@@ -44,20 +56,27 @@ export const usePeople = () => {
         const filteredRelationships = relationshipData.filter(rel => 
           userPeopleIds.includes(rel.person1_id) && userPeopleIds.includes(rel.person2_id)
         );
+        console.log('Filtered relationships:', filteredRelationships);
         setRelationships(filteredRelationships);
       } else {
         setRelationships([]);
       }
     } catch (err) {
+      console.error('Error in fetchRelationships:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch relationships');
     }
   };
 
   const addPerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user found when trying to add person');
+      throw new Error('User not authenticated');
+    }
 
     try {
-      // Clean the data before inserting
+      console.log('Adding person with data:', personData);
+      
+      // Clean the data before inserting - convert empty strings to null
       const cleanData = {
         ...personData,
         user_id: user.id,
@@ -69,13 +88,20 @@ export const usePeople = () => {
         photo_url: personData.photo_url || null
       };
 
+      console.log('Clean data for insertion:', cleanData);
+
       const { data, error } = await supabase
         .from('people')
         .insert([cleanData])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error adding person:', error);
+        throw error;
+      }
+      
+      console.log('Successfully added person:', data);
       setPeople(prev => [...prev, data]);
       return data;
     } catch (err) {
@@ -94,16 +120,18 @@ export const usePeople = () => {
       const person2 = people.find(p => p.id === person2Id);
       
       if (!person1 || !person2) {
+        console.error('One or both people not found:', { person1: !!person1, person2: !!person2 });
         throw new Error('One or both people not found');
       }
       
-      // Check if relationship already exists
+      // Check if relationship already exists (bidirectional)
       const existingRelationship = relationships.find(rel => 
         (rel.person1_id === person1Id && rel.person2_id === person2Id && rel.relationship_type === type) ||
         (rel.person1_id === person2Id && rel.person2_id === person1Id && rel.relationship_type === type)
       );
       
       if (existingRelationship) {
+        console.error('Relationship already exists:', existingRelationship);
         throw new Error('This relationship already exists');
       }
       
@@ -117,9 +145,13 @@ export const usePeople = () => {
         .select()
         .single();
 
-      if (error) throw error;
-      setRelationships(prev => [...prev, data]);
+      if (error) {
+        console.error('Supabase error adding relationship:', error);
+        throw error;
+      }
+      
       console.log('Relationship added successfully:', data);
+      setRelationships(prev => [...prev, data]);
       return data;
     } catch (err) {
       console.error('Error adding relationship:', err);
@@ -130,6 +162,7 @@ export const usePeople = () => {
 
   const updatePerson = async (id: string, updates: Partial<Person>) => {
     try {
+      console.log('Updating person:', id, updates);
       const { data, error } = await supabase
         .from('people')
         .update(updates)
@@ -137,10 +170,16 @@ export const usePeople = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating person:', error);
+        throw error;
+      }
+      
+      console.log('Person updated successfully:', data);
       setPeople(prev => prev.map(p => p.id === id ? data : p));
       return data;
     } catch (err) {
+      console.error('Error updating person:', err);
       setError(err instanceof Error ? err.message : 'Failed to update person');
       throw err;
     }
@@ -148,15 +187,22 @@ export const usePeople = () => {
 
   const deletePerson = async (id: string) => {
     try {
+      console.log('Deleting person:', id);
       const { error } = await supabase
         .from('people')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting person:', error);
+        throw error;
+      }
+      
+      console.log('Person deleted successfully');
       setPeople(prev => prev.filter(p => p.id !== id));
       setRelationships(prev => prev.filter(r => r.person1_id !== id && r.person2_id !== id));
     } catch (err) {
+      console.error('Error deleting person:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete person');
       throw err;
     }

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Users, Search, BarChart3, Link, X } from 'lucide-react';
@@ -6,7 +8,7 @@ import { AddPersonModal } from '../Family/AddPersonModal';
 import { RelationshipModal } from '../Family/RelationshipModal';
 import { FamilyTreeBuilder } from '../FamilyTree/FamilyTreeBuilder';
 import { usePeople } from '../../hooks/usePeople';
-import { Person } from '../../types';
+import { Person, Relationship } from '../../types';
 import { RelationshipDetector } from '../../lib/relationshipDetector';
 
 export const Dashboard: React.FC = () => {
@@ -25,32 +27,44 @@ export const Dashboard: React.FC = () => {
 
   const handleAddPerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     try {
+      console.log('Dashboard: Adding person with data:', personData);
       await addPerson(personData);
     } catch (error) {
-      console.error('Failed to add person:', error);
-      alert('Failed to add person. Please check your Supabase configuration and try again.');
+      console.error('Dashboard: Failed to add person:', error);
+      alert(`Failed to add person: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleAddRelationship = async (person1Id: string, person2Id: string, type: Relationship['relationship_type']) => {
     try {
+      console.log('Dashboard: Adding relationship:', { person1Id, person2Id, type });
       await addRelationship(person1Id, person2Id, type);
     } catch (error) {
-      console.error('Failed to add relationship:', error);
-      // Error is already handled in the hook, just log it here
+      console.error('Dashboard: Failed to add relationship:', error);
+      // Error is already handled in the hook and modal, just log it here
     }
   };
 
   const handleUpdatePerson = async (personData: Omit<Person, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (editingPerson) {
-      await updatePerson(editingPerson.id, personData);
-      setEditingPerson(null);
+      try {
+        await updatePerson(editingPerson.id, personData);
+        setEditingPerson(null);
+      } catch (error) {
+        console.error('Dashboard: Failed to update person:', error);
+        alert(`Failed to update person: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     }
   };
 
   const handleDeletePerson = async (person: Person) => {
     if (window.confirm(`Are you sure you want to delete ${person.first_name} ${person.last_name}?`)) {
-      await deletePerson(person.id);
+      try {
+        await deletePerson(person.id);
+      } catch (error) {
+        console.error('Dashboard: Failed to delete person:', error);
+        alert(`Failed to delete person: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     }
   };
 
@@ -264,7 +278,7 @@ export const Dashboard: React.FC = () => {
                 <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                      <User className="h-6 w-6 text-gray-500" />
+                      <Users className="h-6 w-6 text-gray-500" />
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
