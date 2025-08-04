@@ -75,7 +75,7 @@ npm run dev
 - **Backend**: Supabase (PostgreSQL, Auth, Real-time)
 - **Form Handling**: React Hook Form with Zod validation
 - **Icons**: Lucide React
-- **Build Tool**: Vite
+- **Build Tool**: Next.js
 
 ## Contributing
 
