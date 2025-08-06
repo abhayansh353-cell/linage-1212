@@ -1,7 +1,5 @@
 // This file redirects vite build to use Next.js build instead
-import { defineConfig } from 'vite'
-
-export default defineConfig({
+export default {
   build: {
     rollupOptions: {
       external: ['next'],
@@ -19,4 +17,4 @@ export default defineConfig({
       }
     }
   ]
-})
+}
