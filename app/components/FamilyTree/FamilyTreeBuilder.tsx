@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TreePine, Plus, Users, Download, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Person, Relationship } from '../../types';
+import { HierarchicalTreeView } from './HierarchicalTreeView';
 
 interface FamilyTreeBuilderProps {
   people: Person[];
