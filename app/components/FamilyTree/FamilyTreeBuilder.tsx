@@ -177,10 +177,24 @@ export const FamilyTreeBuilder: React.FC<FamilyTreeBuilderProps> = ({
                         Gen 1
                       </span>
                       <span className="text-xs text-gray-500 ml-2">
-                        {relationships.filter(rel => 
-                          (rel.person1_id === person.id || rel.person2_id === person.id) && 
-                          rel.relationship_type === 'parent-child'
-                        ).length} children
+                        {relationships.filter(rel => {
+                          // Count only relationships where this person is the parent
+                          // In parent-child relationships, we need to determine who is the parent
+                          if (rel.relationship_type !== 'parent-child') return false;
+                          
+                          const otherPersonId = rel.person1_id === person.id ? rel.person2_id : rel.person1_id;
+                          const otherPerson = people.find(p => p.id === otherPersonId);
+                          
+                          if (!otherPerson) return false;
+                          
+                          // If both have birth dates, the older person is the parent
+                          if (person.birth_date && otherPerson.birth_date) {
+                            return new Date(person.birth_date) < new Date(otherPerson.birth_date);
+                          }
+                          
+                          // Fallback: assume person1 is the parent in the relationship
+                          return rel.person1_id === person.id;
+                        }).length} children
                       </span>
                     </div>
                   </div>
