@@ -256,7 +256,6 @@ export const FamilyTreeBuilder: React.FC<FamilyTreeBuilderProps> = ({
         >
           <h4 className="font-medium text-gray-900 mb-2">
             Selected: {selectedPerson.first_name} {selectedPerson.last_name}
-          </h4>
           <p className="text-sm text-gray-600 mb-4">
             Click on another person to create a relationship, or use the "Add Relationship" button above.
           </p>
