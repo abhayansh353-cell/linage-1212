@@ -74,9 +74,44 @@ export const HierarchicalTreeView: React.FC<HierarchicalTreeViewProps> = ({
       parentMap.get(childId)!.push(parentId);
     });
 
-    // Find root nodes (people with no parents)
+    // Create a set of people who are spouses (they'll be shown alongside their partner)
+    const spouseIds = new Set<string>();
+    spouseRels.forEach(rel => {
+      // Find which spouse is a parent (has children)
+      const person1HasChildren = childrenMap.has(rel.person1_id);
+      const person2HasChildren = childrenMap.has(rel.person2_id);
+      
+      if (person1HasChildren && !person2HasChildren) {
+        // person1 is the main parent, person2 is the spouse shown alongside
+        spouseIds.add(rel.person2_id);
+      } else if (person2HasChildren && !person1HasChildren) {
+        // person2 is the main parent, person1 is the spouse shown alongside
+        spouseIds.add(rel.person1_id);
+      } else if (person1HasChildren && person2HasChildren) {
+        // Both have children, pick one to be the main (e.g., older one or male)
+        const person1 = people.find(p => p.id === rel.person1_id);
+        const person2 = people.find(p => p.id === rel.person2_id);
+        if (person1 && person2) {
+          if (person1.gender === 'male') {
+            spouseIds.add(rel.person2_id);
+          } else {
+            spouseIds.add(rel.person1_id);
+          }
+        }
+      } else {
+        // Neither has children - mark one as spouse to avoid duplicate display
+        const person1 = people.find(p => p.id === rel.person1_id);
+        if (person1 && person1.gender === 'male') {
+          spouseIds.add(rel.person2_id);
+        } else {
+          spouseIds.add(rel.person1_id);
+        }
+      }
+    });
+
+    // Find root nodes (people with no parents and not a spouse who will be shown alongside their partner)
     const rootIds = people
-      .filter(p => !parentMap.has(p.id))
+      .filter(p => !parentMap.has(p.id) && !spouseIds.has(p.id))
       .map(p => p.id);
 
     // If no clear roots, pick the oldest people as roots
