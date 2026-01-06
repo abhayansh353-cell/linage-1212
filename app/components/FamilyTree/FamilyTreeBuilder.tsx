@@ -177,24 +177,45 @@ export const FamilyTreeBuilder: React.FC<FamilyTreeBuilderProps> = ({
                         Gen 1
                       </span>
                       <span className="text-xs text-gray-500 ml-2">
-                        {relationships.filter(rel => {
-                          // Count only relationships where this person is the parent
-                          // In parent-child relationships, we need to determine who is the parent
-                          if (rel.relationship_type !== 'parent-child') return false;
+                        {(() => {
+                          const childrenCount = relationships.filter(rel => {
+                            if (rel.relationship_type !== 'parent-child') return false;
+                            
+                            const otherPersonId = rel.person1_id === person.id ? rel.person2_id : rel.person1_id;
+                            const otherPerson = people.find(p => p.id === otherPersonId);
+                            
+                            if (!otherPerson) return false;
+                            
+                            // Determine who is the parent based on birth dates
+                            if (person.birth_date && otherPerson.birth_date) {
+                              const personBirthYear = new Date(person.birth_date).getFullYear();
+                              const otherPersonBirthYear = new Date(otherPerson.birth_date).getFullYear();
+                              
+                              // If there's a significant age gap (15+ years), older is parent
+                              if (Math.abs(personBirthYear - otherPersonBirthYear) >= 15) {
+                                return personBirthYear < otherPersonBirthYear;
+                              }
+                              
+                              // If age gap is small, might be siblings, not parent-child
+                              return false;
+                            }
+                            
+                            // If only one person has birth date, assume they are older if born before 1990
+                            if (person.birth_date && !otherPerson.birth_date) {
+                              return new Date(person.birth_date).getFullYear() < 1990;
+                            }
+                            
+                            if (!person.birth_date && otherPerson.birth_date) {
+                              return new Date(otherPerson.birth_date).getFullYear() > 1990;
+                            }
+                            
+                            // If no birth dates available, use position in relationship
+                            // In most family tree conventions, person1 is the parent
+                            return rel.person1_id === person.id;
+                          }).length;
                           
-                          const otherPersonId = rel.person1_id === person.id ? rel.person2_id : rel.person1_id;
-                          const otherPerson = people.find(p => p.id === otherPersonId);
-                          
-                          if (!otherPerson) return false;
-                          
-                          // If both have birth dates, the older person is the parent
-                          if (person.birth_date && otherPerson.birth_date) {
-                            return new Date(person.birth_date) < new Date(otherPerson.birth_date);
-                          }
-                          
-                          // Fallback: assume person1 is the parent in the relationship
-                          return rel.person1_id === person.id;
-                        }).length} children
+                          return `${childrenCount} ${childrenCount === 1 ? 'child' : 'children'}`;
+                        })()}
                       </span>
                     </div>
                   </div>
